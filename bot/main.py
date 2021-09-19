@@ -2,9 +2,12 @@ import os
 
 import discord
 from discord.abc import _Overwrites
-from dotenv import load_dotenv
 from discord.ext import commands
 from discord import CategoryChannel
+
+if not os.environ.get("PRODUCTION"):
+    from dotenv import load_dotenv
+    load_dotenv()
 
 client = commands.Bot(command_prefix="!")
 
@@ -109,6 +112,5 @@ async def list(ctx, *arg):
             await ctx.message.channel.send("Nobody in this queue")
     else:
         await ctx.message.channel.send("You entered an incorrect vc queue name")
-
-load_dotenv()
+        
 client.run(os.getenv('TOKEN'))
