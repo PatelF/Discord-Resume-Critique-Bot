@@ -31,7 +31,6 @@ pipwin==0.5.1
 playsound==1.2.2
 pocketsphinx==0.1.15
 prompt-toolkit==3.0.19
-PyAudio @ file:///C:/Users/fenil/pipwin/PyAudio-0.2.11-cp39-cp39-win_amd64.whl
 pycparser==2.20
 Pygments==2.9.0
 pyjsparser==2.7.1
