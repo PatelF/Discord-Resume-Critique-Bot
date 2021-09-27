@@ -14,6 +14,7 @@ client = commands.Bot(command_prefix="!")
 
 client.list_of_queues = {}
 client.count = 1
+client.lock_queue_from_list = {}
 
 
 @client.event
@@ -52,22 +53,66 @@ async def deletevc(ctx, vc_name):
 async def join(ctx):
     # check if the channel exists
     voice_state = ctx.author.voice
+    category = discord.utils.get(ctx.guild.categories, name = "Resume VC")
 
-    if voice_state == None:
-        await ctx.message.channel.send("Please enter a waiting room vc first")
-    else:
-        voice_channel = voice_state.channel.name
-
-        await ctx.message.channel.send("Name of voice channel: " + voice_channel)
-
-        if voice_channel.lower() in client.list_of_queues:
-            client.list_of_queues[voice_channel.lower()].append(ctx.author)
+    if (category and discord.utils.get(category.channels, name=voice_state.channel.name)):
+        if voice_state == None:
+            await ctx.message.channel.send("Please enter a waiting room vc first")
         else:
-            new_queue = [ctx.author]
-            client.list_of_queues[voice_channel.lower()] = new_queue
+            voice_channel = voice_state.channel.name
+
+            await ctx.message.channel.send("Name of voice channel: " + voice_channel)
+
+            if voice_channel.lower() in client.list_of_queues:
+                if client.lock_queue_from_list[voice_channel.lower()] == True:
+                    await ctx.message.channel.send(
+                        "Queue has been locked, could not be added"
+                    )
+                else: 
+                    client.list_of_queues[voice_channel.lower()].append(ctx.author)
+            else:
+                new_queue = [ctx.author]
+                client.list_of_queues[voice_channel.lower()] = new_queue
+                client.lock_queue_from_list[voice_channel.lower()] = False
+            
+            if client.lock_queue_from_list[voice_channel.lower()] == False:
+                await ctx.message.channel.send(
+                    "Added " + ctx.author.name + " to queue: " + voice_channel
+                )
+    else:
         await ctx.message.channel.send(
-            "Added " + ctx.author.name + " to queue: " + voice_channel
+            "Please join a voice channel in Resume VC category"
         )
+
+@client.command(name="lock", help="lock a specific queue")
+@commands.has_role("queue mod")
+async def lock(ctx, *arg):
+    queue_name = " ".join(arg)
+
+    if queue_name.lower() == "all":
+        for q in client.lock_queue_from_list:
+            client.lock_queue_from_list[q] = True
+            await ctx.message.channel.send("You have locked all the channels")
+    elif queue_name.lower() in client.lock_queue_from_list:
+            client.lock_queue_from_list[queue_name.lower()] = True
+            await ctx.message.channel.send("You have locked " + queue_name)
+    else:
+        await ctx.message.channel.send("You entered an incorrect vc queue name")
+
+@client.command(name="unlock", help="lock a specific queue")
+@commands.has_role("queue mod")
+async def unlock(ctx, *arg):
+    queue_name = " ".join(arg)
+
+    if queue_name.lower() == "all":
+        for q in client.lock_queue_from_list:
+            client.lock_queue_from_list[q] = False
+            await ctx.message.channel.send("You have unlocked all the channels")
+    elif queue_name.lower() in client.lock_queue_from_list:
+        client.lock_queue_from_list[queue_name.lower()] = False
+        await ctx.message.channel.send("You have unlocked " + queue_name)
+    else:
+        await ctx.message.channel.send("You entered an incorrect vc queue name")
 
 
 @client.command(name="next", help="get next person in specific queue")
