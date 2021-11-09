@@ -80,41 +80,6 @@ async def on_voice_state_update(member, before, after):
 async def clear(ctx):
     await deletevc(ctx, "Temporary VC")
 
-# @client.command(name="join", help="get added to queue")
-# async def join(ctx):
-#     # check if the channel exists
-#     voice_state = ctx.author.voice
-#     category = discord.utils.get(ctx.guild.categories, name = "Resume VC")
-
-#     if (category and discord.utils.get(category.channels, name=voice_state.channel.name)):
-#         if voice_state == None:
-#             await ctx.message.channel.send("Please enter a waiting room vc first")
-#         else:
-#             voice_channel = voice_state.channel.name
-
-#             await ctx.message.channel.send("Name of voice channel: " + voice_channel)
-
-#             if voice_channel.lower() in client.list_of_queues:
-#                 if client.lock_queue_from_list[voice_channel.lower()] == True:
-#                     await ctx.message.channel.send(
-#                         "Queue has been locked, could not be added"
-#                     )
-#                 else: 
-#                     client.list_of_queues[voice_channel.lower()].append(ctx.author)
-#             else:
-#                 new_queue = [ctx.author]
-#                 client.list_of_queues[voice_channel.lower()] = new_queue
-#                 client.lock_queue_from_list[voice_channel.lower()] = False
-            
-#             if client.lock_queue_from_list[voice_channel.lower()] == False:
-#                 await ctx.message.channel.send(
-#                     "Added " + ctx.author.name + " to queue: " + voice_channel
-#                 )
-#     else:
-#         await ctx.message.channel.send(
-#             "Please join a voice channel in Resume VC category"
-#         )
-
 @client.command(name="lock", help="lock a specific queue")
 @commands.has_role("queue mod")
 async def lock(ctx, *arg):
